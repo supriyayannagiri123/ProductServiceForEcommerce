@@ -8,6 +8,7 @@ import dev.umang.productservicenov24.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("selfProductService")
 public class SelfProductService implements ProductService{
@@ -23,12 +24,16 @@ public class SelfProductService implements ProductService{
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        return productRepository.findAll();
     }
 
     @Override
     public Product getSingleProduct(long id) throws ProductNotFoundException {
-        return null;
+        Optional<Product> product = productRepository.findById(id);
+        if(product.isEmpty()){
+            throw new ProductNotFoundException("Product with id " + id + " is not found in the database");
+        }
+        return product.get();
     }
 
     @Override
@@ -50,11 +55,11 @@ public class SelfProductService implements ProductService{
         if(categoryFromDB == null){
             Category newCategory = new Category();
             newCategory.setTitle(category);
-
-            categoryFromDB = newCategory;
+            p.setCategory(newCategory);
+        }else{
+            p.setCategory(categoryFromDB);
         }
 
-        p.setCategory(categoryFromDB);
         Product createdProduct = productRepository.save(p);
 
 
